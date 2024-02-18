@@ -6,6 +6,7 @@ class Empty {
         this.role = "empty";
         this.positionX = originalX;
         this.positionY = originalY;
+        this.isAlive = false;
     }
 }
 
@@ -35,25 +36,34 @@ class ChessPiece {
         objToUpdate.role = this.role;
         objToUpdate.classObj = this;
     }
-
+    
     move(targetX, targetY) {
+        let returnCoordinate = {x: this.positionX, y: this.positionY};
         switch(this.role) {
             case "chariot":
-                const {x, y} = chariotCheckMove(this.positionX, this.positionY, targetX, targetY, this.team);
-                this.positionX = x;
-                this.positionY = y;
+                returnCoordinate = chariotCheckMove(this.positionX, this.positionY, targetX, targetY, this.team);
+                this.positionX = returnCoordinate.x;
+                this.positionY = returnCoordinate.y;
                 break   
             case "horse":
-                horseCheckMove(this.positionX, this.positionY, targetX, targetY, this.team);
+                returnCoordinate = horseCheckMove(this.positionX, this.positionY, targetX, targetY, this.team);
+                this.positionX = returnCoordinate.x;
+                this.positionY = returnCoordinate.y;
                 break   
             case "elephant":
-                elephantCheckMove(this.positionX, this.positionY, targetX, targetY, this.team);
+                returnCoordinate = elephantCheckMove(this.positionX, this.positionY, targetX, targetY, this.team);
+                this.positionX = returnCoordinate.x;
+                this.positionY = returnCoordinate.y;
                 break
             case "advisor":
-                advisorCheckMove(this.positionX, this.positionY, targetX, targetY, this.team);
+                returnCoordinate = advisorCheckMove(this.positionX, this.positionY, targetX, targetY, this.team);
+                this.positionX = returnCoordinate.x;
+                this.positionY = returnCoordinate.y;
                 break
             case "general":
-                generalCheckMove(this.positionX, this.positionY, targetX, targetY, this.team);
+                returnCoordinate = generalCheckMove(this.positionX, this.positionY, targetX, targetY, this.team);
+                this.positionX = returnCoordinate.x;
+                this.positionY = returnCoordinate.y;
                 break
             case "cannon":
                 cannonCheckMove(this.positionX, this.positionY, targetX, targetY, this.team);
@@ -67,7 +77,8 @@ class ChessPiece {
     }
 }
 
-const getPieceUsingCoordinate = (positionX, positionY) => {  //return an object that matches the given coordinate
+const getPieceUsingCoordinate = (positionX, positionY) => {
+    //return an object that matches the given coordinate
     return chessBoard.find(obj => obj.x === positionX && obj.y === positionY);
 }
 
@@ -87,6 +98,21 @@ const isEnemy = (positionX, positionY, selfTeam) => {
     } else {
         return false
     }
+}
+
+const updateChessBoard = (originalX, originalY, targetX, targetY) => {
+    //update the chess board arr with empty and target respectively
+    const originalObj = getPieceUsingCoordinate(originalX, originalY);
+    const targetObj = getPieceUsingCoordinate(targetX, targetY);
+    targetObj.team = originalObj.team;
+    targetObj.role = originalObj.role;
+    targetObj.classObj.isAlive = false;
+    targetObj.classObj.positionX = -1;
+    targetObj.classObj.positionY = -1;
+    targetObj.classObj = originalObj.classObj;
+    originalObj.team = "empty";
+    originalObj.role = "empty";
+    originalObj.classObj = new Empty(originalX, originalY);
 }
 
 const chariotCheckMove = (originalX, originalY, targetX, targetY, selfTeam) => {
@@ -124,32 +150,20 @@ const chariotCheckMove = (originalX, originalY, targetX, targetY, selfTeam) => {
         }
 
     }
-    const updateChessBoard = () => {   //update the chess board arr with empty and target respectively
-        const originalObj = getPieceUsingCoordinate(originalX, originalY);
-        const targetObj = getPieceUsingCoordinate(targetX, targetY);
-        targetObj.team = originalObj.team;
-        targetObj.role = originalObj.role;
-        targetObj.classObj.isAlive = false;
-        targetObj.classObj.positionX = -1;
-        targetObj.classObj.positionY = -1;
-        targetObj.classObj = originalObj.classObj;
-        originalObj.team = "empty";
-        originalObj.role = "empty";
-        originalObj.classObj = new Empty(originalX, originalY);
-    }
-
 
     if (originalX !== targetX && originalY === targetY) {  //moving horizontal
         if(originalX > targetX){  //moving left
             const movementArr = chessBoard.filter(obj => obj.y === originalY && obj.x >= targetX && obj.x <= originalX)
             if(isChariotMoveValid(movementArr)){
-                updateChessBoard();
+                console.log("Chariot valid move1")
+                updateChessBoard(originalX, originalY, targetX, targetY);
                 return {x: targetX, y: targetY}
             }
         } else { //moving right
             const movementArr = chessBoard.filter(obj => obj.y === originalY && obj.x <= targetX && obj.x >= originalX)
             if(isChariotMoveValid(movementArr)){
-                updateChessBoard();
+                console.log("Chariot valid move2")
+                updateChessBoard(originalX, originalY, targetX, targetY);
                 return {x: targetX, y: targetY}
             }
         }
@@ -157,58 +171,239 @@ const chariotCheckMove = (originalX, originalY, targetX, targetY, selfTeam) => {
         if(originalY < targetY) { // moving up
             const movementArr = chessBoard.filter(obj => obj.x === originalX && obj.y <= targetY && obj.y >= originalY)
             if(isChariotMoveValid(movementArr)){
-                updateChessBoard();
+                console.log("Chariot valid move3")
+                updateChessBoard(originalX, originalY, targetX, targetY);
                 return {x: targetX, y: targetY}
             }
         } else { //moving down
             const movementArr = chessBoard.filter(obj => obj.x === originalX && obj.y >= targetY && obj.y <= originalY)
             if(isChariotMoveValid(movementArr)){
-                updateChessBoard();
+                console.log("Chariot valid move4")
+                updateChessBoard(originalX, originalY, targetX, targetY);
                 return {x: targetX, y: targetY}
             }
         }
     }
-    console.log("Invalid move 2") //if all fails
+    console.log("Chariot invalid move 2") //if all fails
     return {x: originalX, y: originalY}
 }
 
-
-const tempBlackSolider = new ChessPiece("black", "solider", 3, 1);
-tempBlackSolider.create();
-// const tempBlackSolider2 = new ChessPiece("black", "soldier", 3, 1);
-// tempBlackSolider2.create();
-const tempRedChariot = new ChessPiece("red", "chariot", 3, 6);
-console.log("Before move:")
-console.log(tempRedChariot)
-tempRedChariot.create();
-tempRedChariot.move(3, 1);
-console.log("After move:")
-console.log(tempBlackSolider);
-console.log(tempRedChariot);
-
-const horseCheckMove = (originalX, originalY, targetX, targetY) => {
+const horseCheckMove = (originalX, originalY, targetX, targetY, selfTeam) => {
     if ((originalX === targetX + 1 || originalX === targetX - 1) && originalY === targetY - 2) {  //moving up, then left or right
-        if (originalY + 1 === isEmpty(originalX, originalY+1)) {
-
+        if (isEmpty(originalX, originalY+1)) {
+            if (originalX === targetX + 1 && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) { //moving up, then left
+                console.log("Horse valid move1");
+                updateChessBoard(originalX, originalY, targetX, targetY);
+                return {x: targetX, y: targetY}
+            } else {
+                //moving up, then right
+                console.log("Horse valid move2");
+                updateChessBoard(originalX, originalY, targetX, targetY);
+                return {x: targetX, y: targetY}
+            }
         }
     }
     if ((originalX === targetX + 1 || originalX === targetX - 1) && originalY === targetY + 2){  //moving down, then left or right
-        if (originalY - 1 === isEmpty(originalX, originalY-1)) {
-
+        if (isEmpty(originalX, originalY-1)) {
+            if (originalX === targetX + 1 && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) { //moving down, then left
+                console.log("Horse valid move3");
+                updateChessBoard(originalX, originalY, targetX, targetY);
+                return {x: targetX, y: targetY}
+            } else {
+                //moving down, then right
+                console.log("Horse valid move4");
+                updateChessBoard(originalX, originalY, targetX, targetY);
+                return {x: targetX, y: targetY}
+            }
         }
     }
-    if (originalX === targetX - 2 && (originalY === targetY + 1 || originalY === targetY - 1)) {  //moving left, then up or down
-        if (originalX - 1 === isEmpty(originalX-1, originalY)) {
-
+    if (originalX === targetX - 2 && (originalY === targetY + 1 || originalY === targetY - 1)) {  //moving right, then up or down
+        if (isEmpty(originalX+1, originalY)) {
+            if (originalY === targetY + 1 && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) { //moving right, then down
+                console.log("Horse valid move5");
+                updateChessBoard(originalX, originalY, targetX, targetY);
+                return {x: targetX, y: targetY}
+            } else {
+                //moving right, then up
+                console.log("Horse valid move6");
+                updateChessBoard(originalX, originalY, targetX, targetY);
+                return {x: targetX, y: targetY}
+            }
         }
     }
-    if (originalX === targetX + 2 && (originalY === targetY + 1 || originalY === targetY - 1)) {  //moving right, then up or down
-        if (originalX + 1 === isEmpty(originalX+1, originalY)) {
-            
+    if (originalX === targetX + 2 && (originalY === targetY + 1 || originalY === targetY - 1)) {  //moving left, then up or down
+        if (isEmpty(originalX-1, originalY)) {
+            if (originalY === targetY + 1 && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) { //moving left, then down
+                console.log("Horse valid move7");
+                updateChessBoard(originalX, originalY, targetX, targetY);
+                return {x: targetX, y: targetY}
+            } else {
+                //moving left, then up
+                console.log("Horse valid move8");
+                updateChessBoard(originalX, originalY, targetX, targetY);
+                return {x: targetX, y: targetY}
+            }
         }
     }
+    console.log("Horse invalid Move2");
+    return {x: originalX, y: originalY}
 }
 
+const elephantCheckMove = (originalX, originalY, targetX, targetY, selfTeam) => {
+    if (originalX - 2 === targetX && originalY + 2 === targetY && isEmpty(originalX - 1, originalY + 1) && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) {
+        //moving left and up
+        console.log("Elephant valid move1");
+        updateChessBoard(originalX, originalY, targetX, targetY);
+        return {x: targetX, y: targetY}
+    }
+    if (originalX + 2 === targetX && originalY + 2 === targetY && isEmpty(originalX + 1, originalY + 1) && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) {
+        //moving right and up
+        console.log("Elephant valid move2");
+        updateChessBoard(originalX, originalY, targetX, targetY);
+        return {x: targetX, y: targetY}
+    }
+    if (originalX - 2 === targetX && originalY - 2 === targetY && isEmpty(originalX - 1, originalY - 1) && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) {
+        //moving left and down
+        console.log("Elephant valid move3");
+        updateChessBoard(originalX, originalY, targetX, targetY);
+        return {x: targetX, y: targetY}
+    }
+    if (originalX + 2 === targetX && originalY - 2 === targetY && isEmpty(originalX + 1, originalY - 1) && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) {
+        //moving right and down
+        console.log("Elephant valid move4");
+        updateChessBoard(originalX, originalY, targetX, targetY);
+        return {x: targetX, y: targetY}
+    }
+    console.log("Elephant invalid move2")
+    return {x: originalX, y: originalY}
+}
+
+const advisorCheckMove = (originalX, originalY, targetX, targetY, selfTeam) => {
+    if (selfTeam === "red" && targetX >= 3 && targetX <= 5 && targetY >= 0 && targetY <= 2) {
+        if (originalX - 1 === targetX && originalY + 1 === targetY && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) {
+            //moving left and up
+            console.log("Advisor valid move1")
+            updateChessBoard(originalX, originalY, targetX, targetY);
+            return {x: targetX, y: targetY}
+        }
+        if (originalX + 1 === targetX && originalY + 1 === targetY && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) {
+            //moving right and up
+            console.log("Advisor valid move2")
+            updateChessBoard(originalX, originalY, targetX, targetY);
+            return {x: targetX, y: targetY}
+        }
+        if (originalX - 1 === targetX && originalY - 1 === targetY && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) {
+            //moving left and down
+            console.log("Advisor valid move3")
+            updateChessBoard(originalX, originalY, targetX, targetY);
+            return {x: targetX, y: targetY}
+        }
+        if (originalX + 1 === targetX && originalY - 1 === targetY && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) {
+            //moving right and down
+            console.log("Advisor valid move4")
+            updateChessBoard(originalX, originalY, targetX, targetY);
+            return {x: targetX, y: targetY}
+        }
+    } else if (selfTeam === "black" && targetX >= 3 && targetX <= 5 && targetY >= 7 && targetY <= 9) {
+        if (originalX - 1 === targetX && originalY + 1 === targetY && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) {
+            //moving left and up
+            console.log("Advisor valid move1")
+            updateChessBoard(originalX, originalY, targetX, targetY);
+            return {x: targetX, y: targetY}
+        }
+        if (originalX + 1 === targetX && originalY + 1 === targetY && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) {
+            //moving right and up
+            console.log("Advisor valid move2")
+            updateChessBoard(originalX, originalY, targetX, targetY);
+            return {x: targetX, y: targetY}
+        }
+        if (originalX - 1 === targetX && originalY - 1 === targetY && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) {
+            //moving left and down
+            console.log("Advisor valid move3")
+            updateChessBoard(originalX, originalY, targetX, targetY);
+            return {x: targetX, y: targetY}
+        }
+        if (originalX + 1 === targetX && originalY - 1 === targetY && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) {
+            //moving right and down
+            console.log("Advisor valid move4")
+            updateChessBoard(originalX, originalY, targetX, targetY);
+            return {x: targetX, y: targetY}
+        }
+    }
+    console.log("Advisor invalid move2")
+    return {x: originalX, y: originalY}
+}
+
+const generalCheckMove = (originalX, originalY, targetX, targetY, selfTeam) => {
+    if (selfTeam === "red" && targetX >= 3 && targetX <= 5 && targetY >= 0 && targetY <= 2) {
+        if (originalX - 1 === targetX && originalY === targetY && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) {
+            //moving left
+            console.log("General valid move1")
+            updateChessBoard(originalX, originalY, targetX, targetY);
+            return {x: targetX, y: targetY}
+        }
+        if (originalX + 1 === targetX && originalY === targetY && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) {
+            //moving right
+            console.log("General valid move2")
+            updateChessBoard(originalX, originalY, targetX, targetY);
+            return {x: targetX, y: targetY}
+        }
+        if (originalX === targetX && originalY + 1 === targetY && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) {
+            //moving up
+            console.log("General valid move3")
+            updateChessBoard(originalX, originalY, targetX, targetY);
+            return {x: targetX, y: targetY}
+        }
+        if (originalX === targetX && originalY - 1 === targetY && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) {
+            //moving down
+            console.log("General valid move4")
+            updateChessBoard(originalX, originalY, targetX, targetY);
+            return {x: targetX, y: targetY}
+        }
+    } else if (selfTeam === "black" && targetX >= 3 && targetX <= 5 && targetY >= 7 && targetY <= 9) {
+        if (originalX - 1 === targetX && originalY === targetY && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) {
+            //moving left
+            console.log("General valid move1")
+            updateChessBoard(originalX, originalY, targetX, targetY);
+            return {x: targetX, y: targetY}
+        }
+        if (originalX + 1 === targetX && originalY === targetY && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) {
+            //moving right
+            console.log("General valid move2")
+            updateChessBoard(originalX, originalY, targetX, targetY);
+            return {x: targetX, y: targetY}
+        }
+        if (originalX === targetX && originalY + 1 === targetY && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) {
+            //moving up
+            console.log("General valid move3")
+            updateChessBoard(originalX, originalY, targetX, targetY);
+            return {x: targetX, y: targetY}
+        }
+        if (originalX === targetX && originalY - 1 === targetY && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) {
+            //moving down
+            console.log("General valid move4")
+            updateChessBoard(originalX, originalY, targetX, targetY);
+            return {x: targetX, y: targetY}
+        }
+    }
+
+    console.log("General invalid move2");
+    return {x: originalX, y: originalY}
+}
+
+const tempBlackSolider = new ChessPiece("black", "solider", 3, 1);
+const tempBlackSolider2 = new ChessPiece("black", "solider", 0, 0);
+tempBlackSolider.create();
+tempBlackSolider2.create();
+// const tempBlackSolider2 = new ChessPiece("black", "soldier", 3, 1);
+// tempBlackSolider2.create();
+const tempRedGeneral = new ChessPiece("red", "general", 5, 2);
+tempRedGeneral.create();
+console.log(tempRedGeneral);
+console.log(tempBlackSolider);
+tempRedGeneral.move(5, 3);
+console.log(tempRedGeneral);
+console.log(tempBlackSolider);
 
 
 
