@@ -26,25 +26,27 @@ class ChessPiece {
     move(targetX, targetY) {
         switch(this.role) {
             case "chariot":
-                chariotCheckMove(this.originalX, this.originalY, targetX, targetY);
+                const {x, y} = chariotCheckMove(this.positionX, this.positionY, targetX, targetY);
+                this.positionX = x;
+                this.positionY = y;
                 break   
             case "horse":
-                horseCheckMove(this.originalX, this.originalY, targetX, targetY);
+                horseCheckMove(this.positionX, this.positionY, targetX, targetY);
                 break   
             case "elephant":
-                elephantCheckMove(this.originalX, this.originalY, targetX, targetY);
+                elephantCheckMove(this.positionX, this.positionY, targetX, targetY);
                 break
             case "advisor":
-                advisorCheckMove(this.originalX, this.originalY, targetX, targetY);
+                advisorCheckMove(this.positionX, this.positionY, targetX, targetY);
                 break
             case "general":
-                generalCheckMove(this.originalX, this.originalY, targetX, targetY);
+                generalCheckMove(this.positionX, this.positionY, targetX, targetY);
                 break
             case "cannon":
-                cannonCheckMove(this.originalX, this.originalY, targetX, targetY);
+                cannonCheckMove(this.positionX, this.positionY, targetX, targetY);
                 break
             case "soldier":
-                soliderCheckMove(this.originalX, this.originalY, targetX, targetY);
+                soliderCheckMove(this.positionX, this.positionY, targetX, targetY);
                 break
             default:
                 break
@@ -52,23 +54,106 @@ class ChessPiece {
     }
 }
 
-
+const checkCoordinate = (positionX, positionY) => {  //return an object that matches the given coordinate
+    return chessBoard.find(obj => obj.x === positionX && obj.y === positionY);
+}
 
 const isEmpty = (positionX, positionY) => {
-    //check something
-    return //true or false
+    // const objToCheck = chessBoard.find(obj => obj.x === positionX && obj.y === positionY);
+    const objToCheck = checkCoordinate(positionX, positionY);
+    if (objToCheck.role === "empty"){
+        return true
+    } else {
+        return false
+    }
+}
+
+const isEnemy = (positionX, positionY, selfTeam) => {
+    const objToCheck = checkCoordinate(positionX, positionY);
+    if (objToCheck.team !== selfTeam && objToCheck.team !=="empty") {
+        return true
+    } else {
+        return false
+    }
 }
 
 const chariotCheckMove = (originalX, originalY, targetX, targetY) => {
-    if (originalX !== targetX && originalY === targetY) {  //moving horizontal
+    const chariotMove = (movementArr) => { //return true if valid move, false if not valid
+        const movementArrRoles = movementArr.map(obj => obj.role);
+        const movementArrRolesWithoutEmpty = movementArrRoles.filter(role => role !== "empty");
+        const movementArrSetSize = new Set(movementArrRoles).size;
+        console.log("Path:")
+        console.log(movementArrRoles);
+        console.log("Path set size:")
+        console.log(movementArrSetSize);
+        console.log('Path without "empty":')
+        console.log(movementArrRolesWithoutEmpty);
+        if (movementArrRoles.length === 2 && movementArrSetSize === 2 && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY))) {
+            //move by one space only
+            //the target must be enemy or an empty cell
+            console.log("Valid move1");
+            return true
+        } else if (movementArrRoles.length > 2 && movementArrRolesWithoutEmpty.length === 1) {
+            //move more than one space
+            //the path only consist of chariot itself and empty cells
+            //after filtering out empty(ies), the new movement array only contains chariot itself
+            console.log("Valid move2")
+            return true
+        } else if (movementArrRoles.length > 2 && movementArrSetSize === 3 && movementArrRolesWithoutEmpty.length === 2 && isEnemy(targetX, targetY)) {
+            //move more than one space
+            //the path consists of exactly chariot, empty(ies), and target
+            //after filtering out empty(ies), the new movement array only contains chariot itself, and one target
+            //the target must be enemy
+            console.log("Valid move3");
+            return true
+        } else {
+            console.log("Invalid move 1")
+            return false
+        }
 
-        return
-    } else if (originalX === targetX && originalY !== targetY){  //moving vertical
-
-        return
     }
-    return console.log("Invalid move")
+    const updateChessBoard = () => {   //update the chess board arr with empty and target respectively
+        return 
+    }
+
+
+    if (originalX !== targetX && originalY === targetY) {  //moving horizontal
+        if(originalX > targetX){  //moving left
+            const movementArr = chessBoard.filter(obj => obj.y === originalY && obj.x >= targetX && obj.x <= originalX)
+            if(chariotMove(movementArr)){
+                return {x: targetX, y: targetY}
+            }
+        } else { //moving right
+            const movementArr = chessBoard.filter(obj => obj.y === originalY && obj.x <= targetX && obj.x >= originalX)
+            if(chariotMove(movementArr)){
+                return {x: targetX, y: targetY}
+            }
+        }
+    } else if (originalX === targetX && originalY !== targetY){  //moving vertical
+        if(originalY < targetY) { // moving up
+            const movementArr = chessBoard.filter(obj => obj.x === originalX && obj.y <= targetY && obj.y >= originalY)
+            if(chariotMove(movementArr)){
+                return {x: targetX, y: targetY}
+            }
+        } else { //moving down
+            const movementArr = chessBoard.filter(obj => obj.x === originalX && obj.y >= targetY && obj.y <= originalY)
+            if(chariotMove(movementArr)){
+                return {x: targetX, y: targetY}
+            }
+        }
+    }
+    console.log("Invalid move 2") //if all fails
+    return {x: originalX, y: originalY}
 }
+
+const tempBlackSolider = new ChessPiece("black", "solider", 3, 1);
+tempBlackSolider.create();
+// const tempBlackSolider2 = new ChessPiece("black", "soldier", 3, 1);
+// tempBlackSolider2.create();
+const tempRedChariot = new ChessPiece("red", "chariot", 3, 6);
+tempRedChariot.create();
+tempRedChariot.move(3, 1);
+console.log(tempRedChariot)
 
 const horseCheckMove = (originalX, originalY, targetX, targetY) => {
     if ((originalX === targetX + 1 || originalX === targetX - 1) && originalY === targetY - 2) {  //moving up, then left or right
