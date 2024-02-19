@@ -101,6 +101,7 @@ class ChessPiece {
         createElement.id = `${this.team}-${this.role}-${this.id}`;
         createElement.src = `img/${this.team}_${this.role}.png`;
         createElement.classList.add("chess-piece");
+        createElement.style.gridArea = `${Math.abs(this.positionY - 10)} / ${this.positionX + 1} / ${Math.abs(this.positionY - 10) + 1} / ${this.positionX + 1 + 1}`;
         createElement.draggable = false;
         createElement.dataset.x = this.positionX;
         createElement.dataset.y = this.positionY;
@@ -111,44 +112,53 @@ class ChessPiece {
     
     move(targetX, targetY) {
         let returnCoordinate = {x: this.positionX, y: this.positionY};
+        let isMoved = false;
         switch(this.role) {
             case "chariot":
                 returnCoordinate = chariotCheckMove(this.positionX, this.positionY, targetX, targetY, this.team);
+                isMoved = (returnCoordinate.x !== this.positionX || returnCoordinate.y !== this.positionY);
                 this.positionX = returnCoordinate.x;
                 this.positionY = returnCoordinate.y;
-                break   
+                console.log(isMoved)
+                return isMoved;
             case "horse":
                 returnCoordinate = horseCheckMove(this.positionX, this.positionY, targetX, targetY, this.team);
+                isMoved = (returnCoordinate.x !== this.positionX || returnCoordinate.y !== this.positionY);
                 this.positionX = returnCoordinate.x;
                 this.positionY = returnCoordinate.y;
-                break   
+                return isMoved;
             case "elephant":
                 returnCoordinate = elephantCheckMove(this.positionX, this.positionY, targetX, targetY, this.team);
+                isMoved = (returnCoordinate.x !== this.positionX || returnCoordinate.y !== this.positionY);
                 this.positionX = returnCoordinate.x;
                 this.positionY = returnCoordinate.y;
-                break
+                return isMoved;
             case "advisor":
                 returnCoordinate = advisorCheckMove(this.positionX, this.positionY, targetX, targetY, this.team);
+                isMoved = (returnCoordinate.x !== this.positionX || returnCoordinate.y !== this.positionY);
                 this.positionX = returnCoordinate.x;
                 this.positionY = returnCoordinate.y;
-                break
+                return isMoved;
             case "general":
                 returnCoordinate = generalCheckMove(this.positionX, this.positionY, targetX, targetY, this.team);
+                isMoved = (returnCoordinate.x !== this.positionX || returnCoordinate.y !== this.positionY);
                 this.positionX = returnCoordinate.x;
                 this.positionY = returnCoordinate.y;
-                break
+                return isMoved;
             case "cannon":
                 returnCoordinate = cannonCheckMove(this.positionX, this.positionY, targetX, targetY, this.team);
+                isMoved = (returnCoordinate.x !== this.positionX || returnCoordinate.y !== this.positionY);
                 this.positionX = returnCoordinate.x;
                 this.positionY = returnCoordinate.y;
-                break
+                return isMoved;
             case "soldier":
                 returnCoordinate = soliderCheckMove(this.positionX, this.positionY, targetX, targetY, this.team);
+                isMoved = (returnCoordinate.x !== this.positionX || returnCoordinate.y !== this.positionY);
                 this.positionX = returnCoordinate.x;
                 this.positionY = returnCoordinate.y;
-                break
+                return isMoved;
             default:
-                break
+                return false
         }
     }
 }
@@ -180,18 +190,21 @@ const updateChessBoard = (originalX, originalY, targetX, targetY) => {
     //update the chess board arr with empty and target respectively
     const originalObj = getPieceUsingCoordinate(originalX, originalY);
     const targetObj = getPieceUsingCoordinate(targetX, targetY);
+
     targetObj.team = originalObj.team;
     targetObj.role = originalObj.role;
     targetObj.classObj.isAlive = false;
     targetObj.classObj.positionX = -1;
     targetObj.classObj.positionY = -1;
     targetObj.classObj = originalObj.classObj;
+
     originalObj.team = "empty";
     originalObj.role = "empty";
     originalObj.classObj = new Empty(originalX, originalY);
 }
 
 const chariotCheckMove = (originalX, originalY, targetX, targetY, selfTeam) => {
+    console.log(`Chariot moving, ox:${originalX} oy:${originalY} tx:${targetX} ty:${targetY}`);
     const isChariotMoveValid = (movementArr) => { //return true if valid move, false if not valid
         const movementArrRoles = movementArr.map(obj => obj.role);
         const movementArrRolesWithoutEmpty = movementArrRoles.filter(role => role !== "empty");
@@ -650,78 +663,12 @@ for (let key in chessPieces) {
     }
 }
 
-//Creating team red
-// const redChariot1 = new ChessPiece("red", "chariot", 0, 0);
-// redChariot1.create(1);
-// const redHorse1 = new ChessPiece("red", "horse", 1, 0);
-// redHorse1.create(1);
-// const redElephant1 = new ChessPiece("red", "elephant", 2, 0);
-// redElephant1.create(1);
-// const redAdvisor1 = new ChessPiece("red", "advisor", 3, 0);
-// redAdvisor1.create(1);
-// const redGeneral = new ChessPiece("red", "general", 4, 0);
-// redGeneral.create(1);
-// const redAdvisor2 = new ChessPiece("red", "advisor", 5, 0);
-// redAdvisor2.create(2);
-// const redElephant2 = new ChessPiece("red", "elephant", 6, 0);
-// redElephant2.create(2);
-// const redHorse2 = new ChessPiece("red", "horse", 7, 0);
-// redHorse2.create(2);
-// const redChariot2 = new ChessPiece("red", "chariot", 8, 0);
-// redChariot2.create(2);
-// const redCannon1 = new ChessPiece("red", "cannon", 1, 2);
-// redCannon1.create(1);
-// const redCannon2 = new ChessPiece("red", "cannon", 7, 2);
-// redCannon2.create(2);
-// const redSoldier1 = new ChessPiece("red", "soldier", 0, 3);
-// redSoldier1.create(1);
-// const redSoldier2 = new ChessPiece("red", "soldier", 2, 3);
-// redSoldier2.create(2);
-// const redSoldier3 = new ChessPiece("red", "soldier", 4, 3);
-// redSoldier3.create(3);
-// const redSoldier4 = new ChessPiece("red", "soldier", 6, 3);
-// redSoldier4.create(4);
-// const redSoldier5 = new ChessPiece("red", "soldier", 8, 3);
-// redSoldier5.create(5);
-// //creating team black
-// const blackChariot1 = new ChessPiece("black", "chariot", 0, 9);
-// blackChariot1.create(1);
-// const blackHorse1 = new ChessPiece("black", "horse", 1, 9);
-// blackHorse1.create(1);
-// const blackElephant1 = new ChessPiece("black", "elephant", 2, 9);
-// blackElephant1.create(1);
-// const blackAdvisor1 = new ChessPiece("black", "advisor", 3, 9);
-// blackAdvisor1.create(1);
-// const blackGeneral = new ChessPiece("black", "general", 4, 9);
-// blackGeneral.create(1);
-// const blackAdvisor2 = new ChessPiece("black", "advisor", 5, 9);
-// blackAdvisor2.create(2);
-// const blackElephant2 = new ChessPiece("black", "elephant", 6, 9);
-// blackElephant2.create(2);
-// const blackHorse2 = new ChessPiece("black", "horse", 7, 9);
-// blackHorse2.create(2);
-// const blackChariot2 = new ChessPiece("black", "chariot", 8, 9);
-// blackChariot2.create(2);
-// const blackCannon1 = new ChessPiece("black", "cannon", 1, 7);
-// blackCannon1.create(1);
-// const blackCannon2 = new ChessPiece("black", "cannon", 7, 7);
-// blackCannon2.create(2);
-// const blackSoldier1 = new ChessPiece("black", "soldier", 0, 6);
-// blackSoldier1.create(1);
-// const blackSoldier2 = new ChessPiece("black", "soldier", 2, 6);
-// blackSoldier2.create(2);
-// const blackSoldier3 = new ChessPiece("black", "soldier", 4, 6);
-// blackSoldier3.create(3);
-// const blackSoldier4 = new ChessPiece("black", "soldier", 6, 6);
-// blackSoldier4.create(4);
-// const blackSoldier5 = new ChessPiece("black", "soldier", 8, 6);
-// blackSoldier5.create(5);
-
 createEmptyElementsFromEmptyCells(chessBoard);
 
 console.log(chessBoard);
 
 let selectedPiece = "";
+let selectedElement = "";
 let clickStage = 0;
 
 
@@ -731,17 +678,42 @@ document.addEventListener("click", event => {
     if (clickStage === 0 && !clickedElement.id.startsWith("e")) {
         //user select a chess piece
         selectedPiece = chessPieces[clickedElement.dataset.name];
+        selectedElement = clickedElement;
         clickStage++;
     }
 
     if(clickStage === 1 && chessPieces[clickedElement.dataset.name] !== selectedPiece) {
         //after selecting a chess piece, user clicked another element that is not the same chess piece
+        const update = () => {
+            //creating an empty element to fill the spot
+            console.log(selectedElement)
+            const newEmptyElement = document.createElement("div");
+            newEmptyElement.style.width = "90%";
+            newEmptyElement.style.height = "90%";
+            newEmptyElement.style.gridArea = selectedElement.style.gridArea;
+            newEmptyElement.dataset.x = selectedElement.dataset.x;
+            newEmptyElement.dataset.y = selectedElement.dataset.y;
+            console.log("2" + selectedElement.style.gridArea);
+            container.append(newEmptyElement);
+
+
+            selectedElement.dataset.x = clickedElement.dataset.x;
+            selectedElement.dataset.y = clickedElement.dataset.y;
+            selectedElement.style.gridArea = clickedElement.style.gridArea;
+
+            clickedElement.remove();
+        }
+
         const x = parseInt(event.target.dataset.x);
         const y = parseInt(event.target.dataset.y);
-        console.log(selectedPiece);
-        selectedPiece.move(x, y);
-        update(element, chessboard);
+        const isMoved = selectedPiece.move(x, y);
+        if (isMoved) {
+            update();
+        }
 
         clickStage = 0;
     }
+
+    console.log(event.target);
+    console.log(clickStage);
 })
