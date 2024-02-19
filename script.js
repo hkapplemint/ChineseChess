@@ -1,38 +1,38 @@
 const container = document.getElementById("container");
 
-const redChariot1Ele = document.getElementById("red-chariot-1");
-const redHorse1Ele = document.getElementById("red-horse-1");
-const redElephant1Ele = document.getElementById("red-elephant-1");
-const redAdvisor1Ele = document.getElementById("red-advisor-1");
-const redGeneralEle = document.getElementById("red-general");
-const redAdvisor2Ele = document.getElementById("red-advisor-2");
-const redElephant2Ele = document.getElementById("red-elephant-2");
-const redHorse2Ele = document.getElementById("red-horse-2");
-const redChariot2Ele = document.getElementById("red-chariot-2");
-const redCannon1Ele = document.getElementById("red-cannon-1");
-const redCannon2Ele = document.getElementById("red-cannon-2");
-const redSoldier1Ele = document.getElementById("red-soldier-1");
-const redSoldier2Ele = document.getElementById("red-soldier-2");
-const redSoldier3Ele = document.getElementById("red-soldier-3");
-const redSoldier4Ele = document.getElementById("red-soldier-4");
-const redSoldier5Ele = document.getElementById("red-soldier-5");
+// const redChariot1Ele = document.getElementById("red-chariot-1");
+// const redHorse1Ele = document.getElementById("red-horse-1");
+// const redElephant1Ele = document.getElementById("red-elephant-1");
+// const redAdvisor1Ele = document.getElementById("red-advisor-1");
+// const redGeneralEle = document.getElementById("red-general");
+// const redAdvisor2Ele = document.getElementById("red-advisor-2");
+// const redElephant2Ele = document.getElementById("red-elephant-2");
+// const redHorse2Ele = document.getElementById("red-horse-2");
+// const redChariot2Ele = document.getElementById("red-chariot-2");
+// const redCannon1Ele = document.getElementById("red-cannon-1");
+// const redCannon2Ele = document.getElementById("red-cannon-2");
+// const redSoldier1Ele = document.getElementById("red-soldier-1");
+// const redSoldier2Ele = document.getElementById("red-soldier-2");
+// const redSoldier3Ele = document.getElementById("red-soldier-3");
+// const redSoldier4Ele = document.getElementById("red-soldier-4");
+// const redSoldier5Ele = document.getElementById("red-soldier-5");
 
-const blackChariot1Ele = document.getElementById("black-chariot-1");
-const blackHorse1Ele = document.getElementById("black-horse-1");
-const blackElephant1Ele = document.getElementById("black-elephant-1");
-const blackAdvisor1Ele = document.getElementById("black-advisor-1");
-const blackGeneralEle = document.getElementById("black-general");
-const blackAdvisor2Ele = document.getElementById("black-advisor-2");
-const blackElephant2Ele = document.getElementById("black-elephant-2");
-const blackHorse2Ele = document.getElementById("black-horse-2");
-const blackChariot2Ele = document.getElementById("black-chariot-2");
-const blackCannon1Ele = document.getElementById("black-cannon-1");
-const blackCannon2Ele = document.getElementById("black-cannon-2");
-const blackSoldier1Ele = document.getElementById("black-soldier-1");
-const blackSoldier2Ele = document.getElementById("black-soldier-2");
-const blackSoldier3Ele = document.getElementById("black-soldier-3");
-const blackSoldier4Ele = document.getElementById("black-soldier-4");
-const blackSoldier5Ele = document.getElementById("black-soldier-5");
+// const blackChariot1Ele = document.getElementById("black-chariot-1");
+// const blackHorse1Ele = document.getElementById("black-horse-1");
+// const blackElephant1Ele = document.getElementById("black-elephant-1");
+// const blackAdvisor1Ele = document.getElementById("black-advisor-1");
+// const blackGeneralEle = document.getElementById("black-general");
+// const blackAdvisor2Ele = document.getElementById("black-advisor-2");
+// const blackElephant2Ele = document.getElementById("black-elephant-2");
+// const blackHorse2Ele = document.getElementById("black-horse-2");
+// const blackChariot2Ele = document.getElementById("black-chariot-2");
+// const blackCannon1Ele = document.getElementById("black-cannon-1");
+// const blackCannon2Ele = document.getElementById("black-cannon-2");
+// const blackSoldier1Ele = document.getElementById("black-soldier-1");
+// const blackSoldier2Ele = document.getElementById("black-soldier-2");
+// const blackSoldier3Ele = document.getElementById("black-soldier-3");
+// const blackSoldier4Ele = document.getElementById("black-soldier-4");
+// const blackSoldier5Ele = document.getElementById("black-soldier-5");
 
 
 class Empty {
@@ -76,28 +76,35 @@ const createEmptyElementsFromEmptyCells = (arr) => {
 createEmptyChessBoard();
 
 
-
 class ChessPiece {
-    constructor(team, role, originalX, originalY) {
+    constructor(team, role, originalX, originalY, id) {
         this.team = team;
         this.role = role;
         this.positionX = originalX;
         this.positionY = originalY;
         this.isAlive = true;
+        this.id = id;
     }
 
-    create(elementId = "") {
+    create() {
+        const kebabToCamel = (kebabString) => {
+            return kebabString.replace((/-([a-z0-9])/g), (_match, letter) => {
+                return letter.toUpperCase();
+            });
+        }
+
         const objToUpdate = chessBoard.find(obj => obj.x === this.positionX && obj.y === this.positionY);
         objToUpdate.team = this.team;
         objToUpdate.role = this.role;
         objToUpdate.classObj = this;
         const createElement = document.createElement("img");
-        createElement.id = `${this.team}-${this.role}-${elementId}`;
+        createElement.id = `${this.team}-${this.role}-${this.id}`;
         createElement.src = `img/${this.team}_${this.role}.png`;
         createElement.classList.add("chess-piece");
         createElement.draggable = false;
         createElement.dataset.x = this.positionX;
         createElement.dataset.y = this.positionY;
+        createElement.dataset.name = `${kebabToCamel(createElement.id)}`
 
         container.append(createElement);
     }
@@ -600,72 +607,115 @@ const soliderCheckMove = (originalX, originalY, targetX, targetY, selfTeam) => {
 
 
 
-//Creating team red
-const redChariot1 = new ChessPiece("red", "chariot", 0, 0);
-redChariot1.create(1);
-const redHorse1 = new ChessPiece("red", "horse", 1, 0);
-redHorse1.create(1);
-const redElephant1 = new ChessPiece("red", "elephant", 2, 0);
-redElephant1.create(1);
-const redAdvisor1 = new ChessPiece("red", "advisor", 3, 0);
-redAdvisor1.create(1);
-const redGeneral = new ChessPiece("red", "general", 4, 0);
-redGeneral.create(1);
-const redAdvisor2 = new ChessPiece("red", "advisor", 5, 0);
-redAdvisor2.create(2);
-const redElephant2 = new ChessPiece("red", "elephant", 6, 0);
-redElephant2.create(2);
-const redHorse2 = new ChessPiece("red", "horse", 7, 0);
-redHorse2.create(2);
-const redChariot2 = new ChessPiece("red", "chariot", 8, 0);
-redChariot2.create(2);
-const redCannon1 = new ChessPiece("red", "cannon", 1, 2);
-redCannon1.create(1);
-const redCannon2 = new ChessPiece("red", "cannon", 7, 2);
-redCannon2.create(2);
-const redSoldier1 = new ChessPiece("red", "soldier", 0, 3);
-redSoldier1.create(1);
-const redSoldier2 = new ChessPiece("red", "soldier", 2, 3);
-redSoldier2.create(2);
-const redSoldier3 = new ChessPiece("red", "soldier", 4, 3);
-redSoldier3.create(3);
-const redSoldier4 = new ChessPiece("red", "soldier", 6, 3);
-redSoldier4.create(4);
-const redSoldier5 = new ChessPiece("red", "soldier", 8, 3);
-redSoldier5.create(5);
+const chessPieces = {
+//creating team red
+    redchariot1: new ChessPiece("red", "chariot", 0, 0, 1),
+    redHorse1: new ChessPiece("red", "horse", 1, 0, 1),
+    redElephant1: new ChessPiece("red", "elephant", 2, 0, 1),
+    redAdvisor1: new ChessPiece("red", "advisor", 3, 0, 1),
+    redGeneral1: new ChessPiece("red", "general", 4, 0, 1),
+    redAdvisor2: new ChessPiece("red", "advisor", 5, 0, 2),
+    redElephant2: new ChessPiece("red", "elephant", 6, 0, 2),
+    redHorse2: new ChessPiece("red", "horse", 7, 0, 2),
+    redChariot2: new ChessPiece("red", "chariot", 8, 0, 2),
+    redCannon1: new ChessPiece("red", "cannon", 1, 2, 1),
+    redCannon2: new ChessPiece("red", "cannon", 7, 2, 2),
+    redSoldier1: new ChessPiece("red", "soldier", 0, 3, 1),
+    redSoldier2: new ChessPiece("red", "soldier", 2, 3, 2),
+    redSoldier3: new ChessPiece("red", "soldier", 4, 3, 3),
+    redSoldier4: new ChessPiece("red", "soldier", 6, 3, 4),
+    redSoldier5: new ChessPiece("red", "soldier", 8, 3, 5),
 //creating team black
-const blackChariot1 = new ChessPiece("black", "chariot", 0, 9);
-blackChariot1.create(1);
-const blackHorse1 = new ChessPiece("black", "horse", 1, 9);
-blackHorse1.create(1);
-const blackElephant1 = new ChessPiece("black", "elephant", 2, 9);
-blackElephant1.create(1);
-const blackAdvisor1 = new ChessPiece("black", "advisor", 3, 9);
-blackAdvisor1.create(1);
-const blackGeneral = new ChessPiece("black", "general", 4, 9);
-blackGeneral.create(1);
-const blackAdvisor2 = new ChessPiece("black", "advisor", 5, 9);
-blackAdvisor2.create(2);
-const blackElephant2 = new ChessPiece("black", "elephant", 6, 9);
-blackElephant2.create(2);
-const blackHorse2 = new ChessPiece("black", "horse", 7, 9);
-blackHorse2.create(2);
-const blackChariot2 = new ChessPiece("black", "chariot", 8, 9);
-blackChariot2.create(2);
-const blackCannon1 = new ChessPiece("black", "cannon", 1, 7);
-blackCannon1.create(1);
-const blackCannon2 = new ChessPiece("black", "cannon", 7, 7);
-blackCannon2.create(2);
-const blackSoldier1 = new ChessPiece("black", "soldier", 0, 6);
-blackSoldier1.create(1);
-const blackSoldier2 = new ChessPiece("black", "soldier", 2, 6);
-blackSoldier2.create(2);
-const blackSoldier3 = new ChessPiece("black", "soldier", 4, 6);
-blackSoldier3.create(3);
-const blackSoldier4 = new ChessPiece("black", "soldier", 6, 6);
-blackSoldier4.create(4);
-const blackSoldier5 = new ChessPiece("black", "soldier", 8, 6);
-blackSoldier5.create(5);
+    blackChariot1: new ChessPiece("black", "chariot", 0, 9, 1),
+    blackHorse1: new ChessPiece("black", "horse", 1, 9, 1),
+    blackElephant1: new ChessPiece("black", "elephant", 2, 9, 1),
+    blackAdvisor1: new ChessPiece("black", "advisor", 3, 9, 1),
+    blackGeneral1: new ChessPiece("black", "general", 4, 9, 1),
+    blackAdvisor2: new ChessPiece("black", "advisor", 5, 9, 2),
+    blackElephant2: new ChessPiece("black", "elephant", 6, 9, 2),
+    blackHorse2: new ChessPiece("black", "horse", 7, 9, 2),
+    blackChariot2: new ChessPiece("black", "chariot", 8, 9, 2),
+    blackCannon1: new ChessPiece("black", "cannon", 1, 7, 1),
+    blackCannon2: new ChessPiece("black", "cannon", 7, 7, 2),
+    blackSoldier1: new ChessPiece("black", "soldier", 0, 6, 1),
+    blackSoldier2: new ChessPiece("black", "soldier", 2, 6, 2),
+    blackSoldier3: new ChessPiece("black", "soldier", 4, 6, 3),
+    blackSoldier4: new ChessPiece("black", "soldier", 6, 6, 4),
+    blackSoldier5: new ChessPiece("black", "soldier", 8, 6, 5)
+}
+
+for (let key in chessPieces) {
+    if(chessPieces.hasOwnProperty(key)) {
+        chessPieces[key].create();
+    }
+}
+
+//Creating team red
+// const redChariot1 = new ChessPiece("red", "chariot", 0, 0);
+// redChariot1.create(1);
+// const redHorse1 = new ChessPiece("red", "horse", 1, 0);
+// redHorse1.create(1);
+// const redElephant1 = new ChessPiece("red", "elephant", 2, 0);
+// redElephant1.create(1);
+// const redAdvisor1 = new ChessPiece("red", "advisor", 3, 0);
+// redAdvisor1.create(1);
+// const redGeneral = new ChessPiece("red", "general", 4, 0);
+// redGeneral.create(1);
+// const redAdvisor2 = new ChessPiece("red", "advisor", 5, 0);
+// redAdvisor2.create(2);
+// const redElephant2 = new ChessPiece("red", "elephant", 6, 0);
+// redElephant2.create(2);
+// const redHorse2 = new ChessPiece("red", "horse", 7, 0);
+// redHorse2.create(2);
+// const redChariot2 = new ChessPiece("red", "chariot", 8, 0);
+// redChariot2.create(2);
+// const redCannon1 = new ChessPiece("red", "cannon", 1, 2);
+// redCannon1.create(1);
+// const redCannon2 = new ChessPiece("red", "cannon", 7, 2);
+// redCannon2.create(2);
+// const redSoldier1 = new ChessPiece("red", "soldier", 0, 3);
+// redSoldier1.create(1);
+// const redSoldier2 = new ChessPiece("red", "soldier", 2, 3);
+// redSoldier2.create(2);
+// const redSoldier3 = new ChessPiece("red", "soldier", 4, 3);
+// redSoldier3.create(3);
+// const redSoldier4 = new ChessPiece("red", "soldier", 6, 3);
+// redSoldier4.create(4);
+// const redSoldier5 = new ChessPiece("red", "soldier", 8, 3);
+// redSoldier5.create(5);
+// //creating team black
+// const blackChariot1 = new ChessPiece("black", "chariot", 0, 9);
+// blackChariot1.create(1);
+// const blackHorse1 = new ChessPiece("black", "horse", 1, 9);
+// blackHorse1.create(1);
+// const blackElephant1 = new ChessPiece("black", "elephant", 2, 9);
+// blackElephant1.create(1);
+// const blackAdvisor1 = new ChessPiece("black", "advisor", 3, 9);
+// blackAdvisor1.create(1);
+// const blackGeneral = new ChessPiece("black", "general", 4, 9);
+// blackGeneral.create(1);
+// const blackAdvisor2 = new ChessPiece("black", "advisor", 5, 9);
+// blackAdvisor2.create(2);
+// const blackElephant2 = new ChessPiece("black", "elephant", 6, 9);
+// blackElephant2.create(2);
+// const blackHorse2 = new ChessPiece("black", "horse", 7, 9);
+// blackHorse2.create(2);
+// const blackChariot2 = new ChessPiece("black", "chariot", 8, 9);
+// blackChariot2.create(2);
+// const blackCannon1 = new ChessPiece("black", "cannon", 1, 7);
+// blackCannon1.create(1);
+// const blackCannon2 = new ChessPiece("black", "cannon", 7, 7);
+// blackCannon2.create(2);
+// const blackSoldier1 = new ChessPiece("black", "soldier", 0, 6);
+// blackSoldier1.create(1);
+// const blackSoldier2 = new ChessPiece("black", "soldier", 2, 6);
+// blackSoldier2.create(2);
+// const blackSoldier3 = new ChessPiece("black", "soldier", 4, 6);
+// blackSoldier3.create(3);
+// const blackSoldier4 = new ChessPiece("black", "soldier", 6, 6);
+// blackSoldier4.create(4);
+// const blackSoldier5 = new ChessPiece("black", "soldier", 8, 6);
+// blackSoldier5.create(5);
 
 createEmptyElementsFromEmptyCells(chessBoard);
 
@@ -674,20 +724,24 @@ console.log(chessBoard);
 let selectedPiece = "";
 let clickStage = 0;
 
+
+
 document.addEventListener("click", event => {
     const clickedElement = event.target;
     if (clickStage === 0 && !clickedElement.id.startsWith("e")) {
         //user select a chess piece
-        selectedPiece = clickedElement;
+        selectedPiece = chessPieces[clickedElement.dataset.name];
         clickStage++;
     }
 
-    if(clickStage === 1 && clickedElement !== selectedPiece) {
+    if(clickStage === 1 && chessPieces[clickedElement.dataset.name] !== selectedPiece) {
         //after selecting a chess piece, user clicked another element that is not the same chess piece
-        
+        const x = parseInt(event.target.dataset.x);
+        const y = parseInt(event.target.dataset.y);
+        console.log(selectedPiece);
+        selectedPiece.move(x, y);
+        update(element, chessboard);
 
         clickStage = 0;
     }
-    console.log(clickedElement);
-    console.log(clickStage);
 })
