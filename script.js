@@ -1,7 +1,6 @@
 const container = document.getElementById("container");
-
-const turnDisplay = document.getElementById("turn-display")
-
+const turnDisplay = document.getElementById("turn-display");
+const restartBtn = document.getElementById("restart-btn");
 
 class Empty {
     constructor(originalX, originalY) {
@@ -41,7 +40,6 @@ const createEmptyElementsFromEmptyCells = (arr) => {
     });
 }
 
-createEmptyChessBoard();
 
 
 class ChessPiece {
@@ -70,6 +68,7 @@ class ChessPiece {
         createElement.src = `img/${this.team}_${this.role}.png`;
         createElement.classList.add("chess-piece");
         createElement.style.gridArea = `${Math.abs(this.positionY - 10)} / ${this.positionX + 1} / ${Math.abs(this.positionY - 10) + 1} / ${this.positionX + 1 + 1}`;
+        createElement.style.zIndex = "1";
         createElement.draggable = false;
         createElement.dataset.x = this.positionX;
         createElement.dataset.y = this.positionY;
@@ -581,10 +580,11 @@ const soliderCheckMove = (originalX, originalY, targetX, targetY, selfTeam) => {
     return {x: originalX, y: originalY}
 }
 
+createEmptyChessBoard();
 
 const chessPieces = {
 //creating team red
-    redchariot1: new ChessPiece("red", "chariot", 0, 0, 1),
+    redChariot1: new ChessPiece("red", "chariot", 0, 0, 1),
     redHorse1: new ChessPiece("red", "horse", 1, 0, 1),
     redElephant1: new ChessPiece("red", "elephant", 2, 0, 1),
     redAdvisor1: new ChessPiece("red", "advisor", 3, 0, 1),
@@ -617,7 +617,9 @@ const chessPieces = {
     blackSoldier3: new ChessPiece("black", "soldier", 4, 6, 3),
     blackSoldier4: new ChessPiece("black", "soldier", 6, 6, 4),
     blackSoldier5: new ChessPiece("black", "soldier", 8, 6, 5)
-}
+    }
+
+
 
 for (let key in chessPieces) {
     if(chessPieces.hasOwnProperty(key)) {
@@ -626,8 +628,6 @@ for (let key in chessPieces) {
 }
 
 createEmptyElementsFromEmptyCells(chessBoard);
-
-console.log(chessBoard);
 
 let selectedPiece = "";
 let selectedElement = "";
@@ -706,15 +706,16 @@ document.addEventListener("click", event => {
                 //check end game
                 if (isRedsTurn && event.target.id.includes("general")) {
                     isGameEnded = true;
-                    turnDisplay.textContent = "Game Ended";
+                    turnDisplay.textContent = "Red Wins!";
                     console.log("Game Ended");
                 } else if (!isRedsTurn && event.target.id.includes("general")) {
                     isGameEnded = true;
-                    turnDisplay.textContent = "Game Ended";
+                    turnDisplay.textContent = "Black Wins!";
                     console.log("Game Ended");
                 } else {
                     isRedsTurn = !isRedsTurn;
-                    turnDisplay.textContent = isRedsTurn ? "Red" : "Black";
+                    turnDisplay.textContent = isRedsTurn ? "Red's turn" : "Black's turn";
+                    turnDisplay.style.color = isRedsTurn ? "red" : "black";
                 }
 
                 
@@ -724,8 +725,11 @@ document.addEventListener("click", event => {
         }
     }
     
-
-
     console.log(event.target);
     console.log(clickStage);
+})
+
+
+restartBtn.addEventListener("click", () => {
+    if(confirm("Reset the board?")) location.reload();
 })

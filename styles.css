@@ -8,6 +8,14 @@ body {
     width: 100vw;
     height: 100vh;
     background: linear-gradient(180deg, #faffe7, #fbf4d2);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#restart-btn {
+    margin: 0 auto;
+    border: 1 solid black;
 }
 
 #container {
@@ -37,7 +45,13 @@ body {
 }
 
 #turn-display {
-    position: absolute;
-    top: 5px;
-    right: 5px;
+    grid-area: 5 / 2 / 6 / 9;
+    z-index: 0;
+    color: red;
+    align-self: end;
+    transform: translateY(50%);
+    font-size: 5vmin;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+
 }
