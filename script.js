@@ -1,38 +1,6 @@
 const container = document.getElementById("container");
 
-// const redChariot1Ele = document.getElementById("red-chariot-1");
-// const redHorse1Ele = document.getElementById("red-horse-1");
-// const redElephant1Ele = document.getElementById("red-elephant-1");
-// const redAdvisor1Ele = document.getElementById("red-advisor-1");
-// const redGeneralEle = document.getElementById("red-general");
-// const redAdvisor2Ele = document.getElementById("red-advisor-2");
-// const redElephant2Ele = document.getElementById("red-elephant-2");
-// const redHorse2Ele = document.getElementById("red-horse-2");
-// const redChariot2Ele = document.getElementById("red-chariot-2");
-// const redCannon1Ele = document.getElementById("red-cannon-1");
-// const redCannon2Ele = document.getElementById("red-cannon-2");
-// const redSoldier1Ele = document.getElementById("red-soldier-1");
-// const redSoldier2Ele = document.getElementById("red-soldier-2");
-// const redSoldier3Ele = document.getElementById("red-soldier-3");
-// const redSoldier4Ele = document.getElementById("red-soldier-4");
-// const redSoldier5Ele = document.getElementById("red-soldier-5");
-
-// const blackChariot1Ele = document.getElementById("black-chariot-1");
-// const blackHorse1Ele = document.getElementById("black-horse-1");
-// const blackElephant1Ele = document.getElementById("black-elephant-1");
-// const blackAdvisor1Ele = document.getElementById("black-advisor-1");
-// const blackGeneralEle = document.getElementById("black-general");
-// const blackAdvisor2Ele = document.getElementById("black-advisor-2");
-// const blackElephant2Ele = document.getElementById("black-elephant-2");
-// const blackHorse2Ele = document.getElementById("black-horse-2");
-// const blackChariot2Ele = document.getElementById("black-chariot-2");
-// const blackCannon1Ele = document.getElementById("black-cannon-1");
-// const blackCannon2Ele = document.getElementById("black-cannon-2");
-// const blackSoldier1Ele = document.getElementById("black-soldier-1");
-// const blackSoldier2Ele = document.getElementById("black-soldier-2");
-// const blackSoldier3Ele = document.getElementById("black-soldier-3");
-// const blackSoldier4Ele = document.getElementById("black-soldier-4");
-// const blackSoldier5Ele = document.getElementById("black-soldier-5");
+const turnDisplay = document.getElementById("turn-display")
 
 
 class Empty {
@@ -340,6 +308,15 @@ const horseCheckMove = (originalX, originalY, targetX, targetY, selfTeam) => {
 }
 
 const elephantCheckMove = (originalX, originalY, targetX, targetY, selfTeam) => {
+    if (selfTeam === "red" && targetY >= 5) {
+        console.log("Red Elephant attempted to cross river")
+        return {x: originalX, y: originalY}
+    }
+    if (selfTeam === "black" && targetY <= 4) {
+        console.log("Black Elephant attempted to cross river")
+        return {x: originalX, y: originalY}
+    }
+
     if (originalX - 2 === targetX && originalY + 2 === targetY && isEmpty(originalX - 1, originalY + 1) && (isEmpty(targetX, targetY) || isEnemy(targetX, targetY, selfTeam))) {
         //moving left and up
         console.log("Elephant valid move1");
@@ -604,21 +581,6 @@ const soliderCheckMove = (originalX, originalY, targetX, targetY, selfTeam) => {
     return {x: originalX, y: originalY}
 }
 
-// const tempBlackSolider = new ChessPiece("black", "solider", 0, 8);
-// // const tempBlackSolider2 = new ChessPiece("black", "solider", 2, 5);
-// tempBlackSolider.create();
-// // tempBlackSolider2.create();
-// const tempRedSoldier = new ChessPiece("black", "soldier", 1, 4);
-// tempRedSoldier.create();
-// console.log(tempRedSoldier);
-// console.log(tempBlackSolider);
-// // console.log(tempBlackSolider2);
-// tempRedSoldier.move(2, 4);
-// console.log(tempRedSoldier);
-// console.log(tempBlackSolider);
-// // console.log(tempBlackSolider2);
-
-
 
 const chessPieces = {
 //creating team red
@@ -671,48 +633,98 @@ let selectedPiece = "";
 let selectedElement = "";
 let clickStage = 0;
 
-
+let isRedsTurn = true;
+let isGameEnded = false;
 
 document.addEventListener("click", event => {
+    if (isGameEnded) {
+        return
+    }
+
     const clickedElement = event.target;
+
     if (clickStage === 0 && !clickedElement.id.startsWith("e")) {
         //user select a chess piece
-        selectedPiece = chessPieces[clickedElement.dataset.name];
-        selectedElement = clickedElement;
-        clickStage++;
+        if(isRedsTurn && clickedElement.id.startsWith("r")) {
+            selectedPiece = chessPieces[clickedElement.dataset.name];
+            selectedElement = clickedElement;
+            selectedElement.classList.add("selected");
+            console.log(selectedElement);
+            clickStage++;
+        } else if (!isRedsTurn && clickedElement.id.startsWith("b")) {
+            selectedPiece = chessPieces[clickedElement.dataset.name];
+            selectedElement = clickedElement;
+            selectedElement.classList.add("selected");
+            console.log(selectedElement);
+            clickStage++;
+        }
     }
 
-    if(clickStage === 1 && chessPieces[clickedElement.dataset.name] !== selectedPiece) {
-        //after selecting a chess piece, user clicked another element that is not the same chess piece
-        const update = () => {
-            //creating an empty element to fill the spot
-            console.log(selectedElement)
-            const newEmptyElement = document.createElement("div");
-            newEmptyElement.style.width = "90%";
-            newEmptyElement.style.height = "90%";
-            newEmptyElement.style.gridArea = selectedElement.style.gridArea;
-            newEmptyElement.dataset.x = selectedElement.dataset.x;
-            newEmptyElement.dataset.y = selectedElement.dataset.y;
-            console.log("2" + selectedElement.style.gridArea);
-            container.append(newEmptyElement);
+    if (clickStage === 1 && chessPieces[clickedElement.dataset.name] !== selectedPiece) {
+        if (isRedsTurn && clickedElement.id.startsWith("r")) {
+            selectedElement.classList.remove("selected");
+            selectedPiece = chessPieces[clickedElement.dataset.name];
+            selectedElement = clickedElement;
+            //new element is now selected
+            selectedElement.classList.add("selected");
+            console.log(selectedElement);
+        } else if (!isRedsTurn && clickedElement.id.startsWith("b")) {
+            selectedElement.classList.remove("selected");
+            selectedPiece = chessPieces[clickedElement.dataset.name];
+            selectedElement = clickedElement;
+            //new element is now selected
+            selectedElement.classList.add("selected");
+            console.log(selectedElement);
+        } else {
+            //after selecting a chess piece, user clicked another element that is not the same chess piece
+            const update = () => {
+                //creating an empty element to fill the spot
+                const newEmptyElement = document.createElement("div");
+                newEmptyElement.style.width = "90%";
+                newEmptyElement.style.height = "90%";
+                newEmptyElement.style.gridArea = selectedElement.style.gridArea;
+                newEmptyElement.dataset.x = selectedElement.dataset.x;
+                newEmptyElement.dataset.y = selectedElement.dataset.y;
+                console.log("2" + selectedElement.style.gridArea);
+                container.append(newEmptyElement);
+        
+        
+                selectedElement.dataset.x = clickedElement.dataset.x;
+                selectedElement.dataset.y = clickedElement.dataset.y;
+                selectedElement.style.gridArea = clickedElement.style.gridArea;
+        
+                clickedElement.remove();
+            }
 
+            selectedElement.classList.remove("selected");
+            const x = parseInt(event.target.dataset.x);
+            const y = parseInt(event.target.dataset.y);
+            const isMoved = selectedPiece.move(x, y);
+            if (isMoved) {
+                update();
 
-            selectedElement.dataset.x = clickedElement.dataset.x;
-            selectedElement.dataset.y = clickedElement.dataset.y;
-            selectedElement.style.gridArea = clickedElement.style.gridArea;
+                //check end game
+                if (isRedsTurn && event.target.id.includes("general")) {
+                    isGameEnded = true;
+                    turnDisplay.textContent = "Game Ended";
+                    console.log("Game Ended");
+                } else if (!isRedsTurn && event.target.id.includes("general")) {
+                    isGameEnded = true;
+                    turnDisplay.textContent = "Game Ended";
+                    console.log("Game Ended");
+                } else {
+                    isRedsTurn = !isRedsTurn;
+                    turnDisplay.textContent = isRedsTurn ? "Red" : "Black";
+                }
 
-            clickedElement.remove();
+                
+            }
+        
+            clickStage = 0;
         }
-
-        const x = parseInt(event.target.dataset.x);
-        const y = parseInt(event.target.dataset.y);
-        const isMoved = selectedPiece.move(x, y);
-        if (isMoved) {
-            update();
-        }
-
-        clickStage = 0;
     }
+    
+
 
     console.log(event.target);
     console.log(clickStage);
