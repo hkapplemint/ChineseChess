@@ -20,7 +20,6 @@ const createEmptyChessBoard = () => {
         }
     }
 };
-
 const createEmptyElementsFromEmptyCells = (arr) => {
     arr.forEach(obj => {
         if (obj.role === "empty" && obj.team === "empty"){
@@ -636,6 +635,78 @@ let clickStage = 0;
 let isRedsTurn = true;
 let isGameEnded = false;
 
+let minimaxIsRedWinner = false;
+let minimaxIsBlackWinner = false;
+
+class gameStateNode {
+    constructor() {
+        this.team = "black";
+    };
+
+    isTerminalNode() {
+        if (minimaxIsRedWinner || minimaxIsBlackWinner) {
+            return true
+        }
+        return false
+    };
+
+    evaluate() {
+        if (minimaxIsRedWinner) {
+            return -1;
+        } else if (minimaxIsBlackWinner) {
+            return 1
+        }
+    };
+
+    children(maximizingPlayer) {
+        let children = [];
+
+        if(maximizingPlayer){  //black's children
+            children = chessPieces.filter(obj => obj.team==="black");
+            return children
+        } else if (!maximizingPlayer){  //black's children
+            children = chessPieces.filter(obj => obj.team==="red");
+            return children
+        }
+    }
+}
+
+const node = new gameStateNode();
+
+const miniMax = (node, depth, maximizingPlayer, alpha = Number.NEGATIVE_INFINITY, beta = Number.POSITIVE_INFINITY) => {
+    if (depth === 0 || node.isTerminalNode()) {
+        return node.evaluate();
+    }
+
+    if (maximizingPlayer) {
+        let maxEval = Number.NEGATIVE_INFINITY;
+        for (let child of node.children(maximizingPlayer)) {
+            let eval = miniMax(child, depth - 1, false, alpha, beta)
+            maxEval = Math.max(maxEval, eval);
+            alpha = Math.max(alpha, eval);
+            if(beta <= alpha) {
+                break;
+            }
+        }
+        return maxEval;
+    } else {
+        let minEval = Number.POSITIVE_INFINITY;
+        for (let child of node.children(!maximizingPlayer)) {
+            let eval = miniMax(child, depth - 1, true, alpha, beta);
+            minEval = Math.min(minEval, eval);
+            beta = Math.min(beta, eval);
+            if (beta <= alpha) {
+                break;
+            }
+        }
+        return minEval;
+    }
+};
+
+miniMax(node, 30,)
+
+
+
 document.addEventListener("click", event => {
     if (isGameEnded) {
         return
@@ -707,11 +778,13 @@ document.addEventListener("click", event => {
                 if (isRedsTurn && event.target.id.includes("general")) {
                     isGameEnded = true;
                     turnDisplay.textContent = "Red Wins!";
+                    minimaxIsRedWinner = true;
                     console.log("Game Ended");
                 } else if (!isRedsTurn && event.target.id.includes("general")) {
                     isGameEnded = true;
                     turnDisplay.textContent = "Black Wins!";
                     console.log("Game Ended");
+                    minimaxIsBlackWinner = true;
                 } else {
                     isRedsTurn = !isRedsTurn;
                     turnDisplay.textContent = isRedsTurn ? "Red's turn" : "Black's turn";
