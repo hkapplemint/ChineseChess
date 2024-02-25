@@ -16,11 +16,14 @@ body {
 #restart-btn {
     margin: 0 auto;
     border: 1 solid black;
+    font-size: 2em;
 }
 
 #container {
+    align-self: center;
     max-height: 90vh;
-    margin: 30px auto;
+    margin: 30px;
+    margin-right: 40px;
     aspect-ratio: 10 / 13;
     display: grid;
     grid-template: repeat(10, 1fr) / repeat(9, 1fr);
